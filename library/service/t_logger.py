@@ -1,5 +1,6 @@
 from config.settings import PROJECT_NAME, LOG_PATH
 import logging
+import time
 import os
 
 
@@ -19,7 +20,7 @@ class Logger(object):
         self._log_path = LOG_PATH
 
     def get_global_logger(self):
-        path = "{}{}".format(self._log_path, self._project_name)
+        path = "{}{}".format(self._log_path, time.strftime("%Y-%m-%d", time.localtime()))
         if not os.path.exists(path):
             os.makedirs(path)
 
@@ -35,7 +36,7 @@ class Logger(object):
     @classmethod
     def _get_module_log_path(cls, file_path):
         path = file_path.split("/")
-        return "{}/{}/".format(path[-3], path[-1][:-3])
+        return "{}/{}/{}/".format(time.strftime("%Y-%m-%d", time.localtime()), path[-3], path[-1][:-3])
 
     @classmethod
     def _get_logger(cls, log_name: str, path: str):

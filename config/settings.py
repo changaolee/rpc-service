@@ -1,2 +1,2 @@
 PROJECT_NAME = "rpc-service"
-LOG_PATH = "./"
+LOG_PATH = "./logs/"
