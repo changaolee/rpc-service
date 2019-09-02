@@ -1,8 +1,11 @@
 class HelloWorld(object):
     _instance = None
+    _logger = None
 
     @classmethod
-    def get_instance(cls):
+    def get_instance(cls, logger=None):
+        if logger:
+            cls._logger = logger
         if not cls._instance:
             cls._instance = HelloWorld()
         return cls._instance
@@ -12,4 +15,5 @@ class HelloWorld(object):
 
     @classmethod
     def echo(cls, content: str):
+        cls._logger.debug("into hello_world:echo")
         return "echo: " + content

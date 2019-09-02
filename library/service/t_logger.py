@@ -25,8 +25,17 @@ class Logger(object):
 
         return self._get_logger(self._project_name, path)
 
-    def get_module_logger(self):
-        pass
+    def get_module_logger(self, file_path, controller):
+        path = "{}{}{}".format(self._log_path, self._get_module_log_path(file_path), controller)
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        return self._get_logger(controller, path)
+
+    @classmethod
+    def _get_module_log_path(cls, file_path):
+        path = file_path.split("/")
+        return "{}/{}/".format(path[-3], path[-1][:-3])
 
     @classmethod
     def _get_logger(cls, log_name: str, path: str):
