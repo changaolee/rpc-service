@@ -1,8 +1,8 @@
 from library.protocol.thrift import ThriftService
-from library.service import worker, t_server, logger
-from config.settings import PROJECT_NAME, LOG_PATH
+from library.service import t_worker, t_server
+from library.service.t_logger import Logger
 
 if __name__ == '__main__':
-    handler = worker.Worker(logger.get_global_logger(PROJECT_NAME, LOG_PATH))
+    handler = t_worker.Worker(Logger.get_instance().get_global_logger())
     server = t_server.ThriftServer("0.0.0.0", 9090, handler, ThriftService, 4)
     server.start()
