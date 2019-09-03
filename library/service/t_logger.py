@@ -1,4 +1,5 @@
 from config.settings import PROJECT_NAME, LOG_PATH
+import traceback
 import logging
 import time
 import os
@@ -26,12 +27,14 @@ class Logger(object):
 
         return self._get_logger(self._project_name, path)
 
-    def get_module_logger(self, file_path, controller):
-        path = "{}{}{}".format(self._log_path, self._get_module_log_path(file_path), controller)
+    def get_module_logger(self):
+        s = traceback.extract_stack()
+        file_path, function = s[-2][0], s[-2][2]
+        path = "{}{}".format(self._log_path, self._get_module_log_path(file_path))
         if not os.path.exists(path):
             os.makedirs(path)
 
-        return self._get_logger(controller, path)
+        return self._get_logger(function, path)
 
     @classmethod
     def _get_module_log_path(cls, file_path):
