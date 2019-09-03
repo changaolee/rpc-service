@@ -30,7 +30,7 @@ class Logger(object):
     def get_module_logger(self):
         s = traceback.extract_stack()
         file_path, function = s[-2][0], s[-2][2]
-        path = "{}{}".format(self._log_path, self._get_module_log_path(file_path))
+        path = "{}{}{}".format(self._log_path, self._get_module_log_path(file_path), function)
         if not os.path.exists(path):
             os.makedirs(path)
 
