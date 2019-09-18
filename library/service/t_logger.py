@@ -10,6 +10,9 @@ class Logger(object):
     _log_path = None
     _instance = None
 
+    _log_format = "%(asctime)s.%(msecs)03d - %(name)s - %(levelname)s - %(message)s"
+    _date_format = "%Y-%m-%d %H:%M:%S"
+
     @classmethod
     def get_instance(cls):
         if not cls._instance:
@@ -19,6 +22,7 @@ class Logger(object):
     def __init__(self):
         self._project_name = PROJECT_NAME
         self._log_path = LOG_PATH
+        logging.basicConfig(level=logging.DEBUG, format=self._log_format, datefmt=self._date_format)
 
     def get_global_logger(self):
         path = "{}{}".format(self._log_path, time.strftime("%Y-%m-%d", time.localtime()))
@@ -43,8 +47,9 @@ class Logger(object):
 
     @classmethod
     def _get_logger(cls, log_name: str, path: str):
-        log_format = "%(asctime)s.%(msecs)03d - %(name)s - %(levelname)s - %(message)s"
-        logging.basicConfig(level=logging.DEBUG, format=log_format, datefmt="%Y-%m-%d %H:%M:%S")
+        if log_name in logging.root.manager.loggerDict:
+            return logging.getLogger(log_name)
+
         logger = logging.getLogger(log_name)
         fh = logging.FileHandler(
             filename="{}/{}.log".format(path, log_name),
