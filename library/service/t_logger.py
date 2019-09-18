@@ -10,8 +10,10 @@ class Logger(object):
     _log_path = None
     _instance = None
 
-    _log_format = "%(asctime)s.%(msecs)03d - %(name)s - %(levelname)s - %(message)s"
-    _date_format = "%Y-%m-%d %H:%M:%S"
+    LOG_FORMAT = "{'@timestamp':'%(asctime)s', 'log_name': '%(name)s', level': '%(levelname)s', 'msg': '%(message)s'}"
+    DATE_FORMAT = "%Y-%m-%dT%H:%M:%S%z"
+
+    _log_format = logging.Formatter(LOG_FORMAT, DATE_FORMAT)
 
     @classmethod
     def get_instance(cls):
@@ -22,7 +24,6 @@ class Logger(object):
     def __init__(self):
         self._project_name = PROJECT_NAME
         self._log_path = LOG_PATH
-        logging.basicConfig(level=logging.DEBUG, format=self._log_format, datefmt=self._date_format)
 
     def get_global_logger(self):
         path = "{}{}".format(self._log_path, time.strftime("%Y-%m-%d", time.localtime()))
@@ -34,11 +35,13 @@ class Logger(object):
     def get_module_logger(self):
         s = traceback.extract_stack()
         file_path, function = s[-2][0], s[-2][2]
-        path = "{}{}{}".format(self._log_path, self._get_module_log_path(file_path), function)
+        module_log_path = self._get_module_log_path(file_path)
+        path = "{}{}{}".format(self._log_path, module_log_path, function)
         if not os.path.exists(path):
             os.makedirs(path)
 
-        return self._get_logger(function, path)
+        log_name = '.'.join(module_log_path.split('/')[1:3] + [function])
+        return self._get_logger(log_name, path)
 
     @classmethod
     def _get_module_log_path(cls, file_path):
@@ -51,11 +54,14 @@ class Logger(object):
             return logging.getLogger(log_name)
 
         logger = logging.getLogger(log_name)
+        logger.setLevel(logging.DEBUG)
         fh = logging.FileHandler(
             filename="{}/{}.log".format(path, log_name),
             encoding="utf8"
         )
+        fh.setFormatter(cls._log_format)
         ch = logging.StreamHandler()
+        ch.setFormatter(cls._log_format)
         logger.addHandler(fh)
         logger.addHandler(ch)
         return logger

@@ -15,5 +15,5 @@ class HelloWorld(object):
 
     @classmethod
     def echo(cls, content: str):
-        cls._logger.debug("into hello_world:echo")
+        cls._logger.info("into hello_world:echo")
         return "echo: " + content
