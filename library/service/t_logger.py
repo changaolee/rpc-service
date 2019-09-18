@@ -44,12 +44,13 @@ class Logger(object):
     @classmethod
     def _get_logger(cls, log_name: str, path: str):
         log_format = "%(asctime)s.%(msecs)03d - %(name)s - %(levelname)s - %(message)s"
-        logging.basicConfig(level=logging.DEBUG, format=log_format, datefmt="%Y-%m-%d %H:%M:%S", handlers=[
-            logging.FileHandler(
-                filename="{}/{}.log".format(path, log_name),
-                encoding="utf8"
-            ),
-            logging.StreamHandler()
-        ])
+        logging.basicConfig(level=logging.DEBUG, format=log_format, datefmt="%Y-%m-%d %H:%M:%S")
         logger = logging.getLogger(log_name)
+        fh = logging.FileHandler(
+            filename="{}/{}.log".format(path, log_name),
+            encoding="utf8"
+        )
+        ch = logging.StreamHandler()
+        logger.addHandler(fh)
+        logger.addHandler(ch)
         return logger
