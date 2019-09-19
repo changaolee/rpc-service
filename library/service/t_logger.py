@@ -56,7 +56,7 @@ class Logger(object):
         logger = logging.getLogger(log_name)
         logger.setLevel(logging.DEBUG)
         fh = logging.FileHandler(
-            filename="{}/{}.log".format(path, log_name),
+            filename="{}/run.log".format(path),
             encoding="utf8"
         )
         fh.setFormatter(cls._log_format)
