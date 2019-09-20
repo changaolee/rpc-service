@@ -89,6 +89,11 @@ class Worker(object):
                     params[defined_param] = defined_param_info["default"]
             else:
                 try:
+                    if defined_param_info["type"] == list:
+                        if isinstance(params[defined_param], (int, str)):
+                            params[defined_param] = [params[defined_param]]
+                        elif isinstance(params[defined_param], dict):
+                            params[defined_param] = list(params[defined_param].values())
                     params[defined_param] = defined_param_info["type"](params[defined_param])
                 except:
                     raise RpcParamsException(
