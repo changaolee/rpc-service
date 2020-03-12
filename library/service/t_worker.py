@@ -1,7 +1,7 @@
-import time
-import json
+from library.base.process import process_path
 import traceback
-import importlib
+import json
+import time
 
 
 class RpcParamsException(Exception):
@@ -30,9 +30,14 @@ class Worker(object):
                     "message": msg,
                     "result": result
                 }
-        except Exception as e:
-            self._logger.error("traceback.format_exc():____%s" % (traceback.format_exc()))
-            response = self._get_error(str(e))
+        except RpcParamsException as ex:
+            self._logger.debug("traceback.format_exc():____%s" % (traceback.format_exc()))
+            self._logger.error("incoming:{} {}".format(body, ex))
+            response = self._get_error(str(ex))
+        except Exception as ex:
+            self._logger.debug("traceback.format_exc():____%s" % (traceback.format_exc()))
+            self._logger.error("incoming:{} {}".format(body, ex))
+            response = self._get_error(str(ex))
 
         return json.dumps(response)
 
@@ -69,36 +74,8 @@ class Worker(object):
             raise RpcParamsException("参数错误:{}:{}".format(body, "缺少params"))
 
         try:
-            _, module, controller, method = path.split("/")
-            action = importlib.import_module("modules.{}.controllers.{}".format(module, controller))
-            func = getattr(action, method)
-        except:
-            raise RpcParamsException("参数错误:{}:{}".format(body, "路径解析失败"))
-
-        try:
-            config_file = importlib.import_module("config.params.{}.{}".format(module, controller))
-            param_config_info = getattr(config_file, "param_check")[method]
-        except:
-            raise RpcParamsException("参数错误:{}:{}".format(body, "未找到参数配置文件"))
-
-        for defined_param, defined_param_info in param_config_info.items():
-            if not params.get(defined_param):
-                if defined_param_info.get("need_necessary"):
-                    raise RpcParamsException("参数错误:{}:{}".format(body, "缺少参数{}".format(defined_param)))
-                else:
-                    params[defined_param] = defined_param_info["default"]
-            else:
-                try:
-                    if defined_param_info["type"] == list:
-                        if isinstance(params[defined_param], (int, str)):
-                            params[defined_param] = [params[defined_param]]
-                        elif isinstance(params[defined_param], dict):
-                            params[defined_param] = list(params[defined_param].values())
-                    params[defined_param] = defined_param_info["type"](params[defined_param])
-                except:
-                    raise RpcParamsException(
-                        "参数错误:{}:{}".format(body, "需要{}类型的参数{}".format(defined_param_info["type"], defined_param)))
-
-        result = func(**params)
+            result = process_path(path, params)
+        except ModuleNotFoundError:
+            raise RpcParamsException("参数错误:{}:{}".format(body, "path 不存在"))
 
         return result
