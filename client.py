@@ -5,7 +5,7 @@ import json
 if __name__ == '__main__':
     request_data_list = [
         {
-            "url": "/say/hello/echo_content",
+            "url": "/say/hello/echo",
             "params": {
                 "content": "Hello world"
             }
