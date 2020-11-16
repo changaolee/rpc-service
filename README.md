@@ -23,7 +23,7 @@
 
 ## CLI 统一入口
 
-> python3 app.py --uri="/say/hello/echo_content" --content="hello world"
+> python3 app.py --uri="/say/hello/echo" --content="hello world"
 
 ## API
 
